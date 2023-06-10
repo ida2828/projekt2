@@ -11,7 +11,7 @@ INSTRUKCJA do korzystania z wtyczki "Wtyczka PyQGIS"
 
 -system operacyjny Windows
 
--zainstalowany na danym urządzeniu Python w wersji 3.9 oraz Spyder, QGIS
+-zainstalowany na danym urządzeniu Python w wersji 3.9 oraz Spyder, QGIS 3.28.7
 
 -biblioteka NumPy oraz SciPy
 
