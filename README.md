@@ -8,10 +8,15 @@ INSTRUKCJA do korzystania z wtyczki "Wtyczka PyQGIS"
 1.2 Obliczenie pola powierzchni między zaznaczonymi punktami
 
 2. Warunki działania wtyczki
+
 -system operacyjny Windows
+
 -zainstalowany na danym urządzeniu Python w wersji 3.9 oraz Spyder, QGIS
+
 -biblioteka NumPy oraz SciPy
+
 -pobranie warstwy z wysokościami oraz współrzędnymi np. z Rejestrów z Geoportalu z usługi EGiB - WFS
+
 3. Praca z programem
 
 Aby użyć wtyczki "Wtyczka PyQGIS" należy dysponować warstwą ze współrzędnymi w układzie 2000 oraz wysokościami. Aby pozyskać taką warste można skorzystać z zasobów EGiB na
