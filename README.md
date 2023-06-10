@@ -2,6 +2,7 @@
 INSTRUKCJA do korzystania z wtyczki "Wtyczka PyQGIS"
 
 1. Zastosowanie wtyczki
+
 1.1 Obliczanie róznicy wysokości dwóch zaznaczonych punktów
 
 1.2 Obliczenie pola powierzchni między zaznaczonymi punktami
