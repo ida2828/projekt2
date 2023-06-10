@@ -6,7 +6,6 @@ INSTRUKCJA do korzystania z wtyczki "Wtyczka PyQGIS"
 
 1.2 Obliczenie pola powierzchni między zaznaczonymi punktami
 
-
 2. Warunki działania wtyczki
 -system operacyjny Windows
 -zainstalowany na danym urządzeniu Python w wersji 3.9 oraz Spyder, QGIS
