@@ -34,4 +34,4 @@ Wartość podawana jest to wartość bezwzględna różnicy dwóch punktów, w m
 pod napisem "Oblicz pole powierzchni".
 Jeżeli użytkownik zaznaczy mniej niż 3 punkty w komunikatach ukaże się ostrzeżenie "WARNING" mówiące o tym ile punktów powinien poprawnie wybrać.
 Gdy użytkownik prawidłowo wybierze ilość punktów i naciśnie klawisz policz, wynik działania pojawi się pod klawiszem policz oraz w Komunikatach w zakładce "Pole powierzchni" jako "SUCCESS"
-Wartość podawana jest w metrach kwadratowych w układzie 2000.
+Wartość podawana jest w hektarach w układzie 2000.
