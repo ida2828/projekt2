@@ -30,6 +30,8 @@ from math import sqrt
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
 from qgis.core import QgsMessageLog, Qgis
+from qgis.core import QgsProject, QgsPointXY
+from qgis.utils import iface
 
 # This loads your .ui file so that PyQt can populate your plugin with the elements from Qt Designer
 FORM_CLASS, _ = uic.loadUiType(os.path.join(
@@ -51,17 +53,18 @@ class WtyczkaPyQGISDialog(QtWidgets.QDialog, FORM_CLASS):
     
     def policzH(self):
         if self.warstwa.currentLayer() is None:
-            QgsMessageLog.logMessage('Nie wybrano aktywnej warstwy.', 'Różnica wysokoci', Qgis.Warning)
+            iface.messageBar().pushMessage('Nie wybrano aktywnej warstwy.', level = Qgis.Warning)
             return False
 
         zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
         if len(zaznaczone_elementy) < 2:
-            QgsMessageLog.logMessage('Wybierz co najmniej 2 punkty na warstwie.', 'Różnica wysokoci', Qgis.Warning)
+            iface.messageBar().pushMessage('Wybierz co najmniej 2 punkty na warstwie.', level = Qgis.Warning)
             return False
+        
         
         zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
         if len(zaznaczone_elementy) >  2:
-            QgsMessageLog.logMessage('Wybierz co najwyżej 2 punkty na warstwie.', 'Różnica wysokoci', Qgis.Warning)
+            iface.messageBar().pushMessage('Wybierz co najwyżej 2 punkty na warstwie.',level = Qgis.Warning)
             return False
         
         zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
@@ -74,73 +77,38 @@ class WtyczkaPyQGISDialog(QtWidgets.QDialog, FORM_CLASS):
             roznica_H = roznica_H
         self.label_H.setText(str(roznica_H))
         
-        QgsMessageLog.logMessage('Różnica wysokości między punktami wynosi: ' + str(roznica_H) + ' m' , ' Różnica wysokości', Qgis.Success)
+        iface.messageBar().pushMessage('Różnica wysokości między punktami wynosi: ' + str(roznica_H) + ' m' , Qgis.Success)
         
         
+        
+         
+             
     def policzP(self):
         zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
+        punkty = []
+        for o in zaznaczone_elementy:
+            x = float(o.attribute('x2000'))
+            y = float(o.attribute('y2000'))
+            x = float(o.geometry().asPoint().x())
+            y = float(o.geometry().asPoint().y())
+            p = QgsPointXY(x, y)
+            punkty.append(p)
+
         if len(zaznaczone_elementy) < 3:
-            QgsMessageLog.logMessage('Wybierz co najmniej 3 punkty na warstwie.', 'Pole powierzchni', Qgis.Warning)
+            iface.messageBar().pushMessage('Wybierz co najmniej 3 punkty na warstwie.', level=Qgis.Warning)
             return False
 
-        xy = np.array([(float(p['x2000']), float(p['y2000'])) for p in zaznaczone_elementy])
+        pole = 0
+        dl = len(zaznaczone_elementy)
+        for i in range(dl):
+            a = (i + 1) % dl
+            pole += (punkty[a].x() + punkty[i].x()) * (punkty[a].y() - punkty[i].y())
+        pole /= 2
+        pole = round(abs(pole / 10000), 3)
 
-        tri = Delaunay(xy)
+        self.label_P.setText(str(pole) + ' ha')
+        iface.messageBar().pushMessage(f'Pole powierzchni między zaznaczonymi punktami: {pole} ha', level=Qgis.Success)
 
-        pole_P = 0.0
-        for simp in tri.simplices:
-            a, b, c = simp
-            x1, y1 = xy[a]
-            x2, y2 = xy[b]
-            x3, y3 = xy[c]
-            pole_P += abs(0.5 * (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)))
-
-        pole_P = round(pole_P, 3)
-
-        QgsMessageLog.logMessage('Pole powierzchni między zaznaczonymi punktami: ' + str(pole_P) + ' m²', 'Pole powierzchni', Qgis.Success)
-
-
-'''
-#wersja tylko z trójkątem
-    def policzP(self):
-        if self.warstwa.currentLayer() is None:
-            QgsMessageLog.logMessage('Nie wybrano aktywnej warstwy.', 'Pole powierzchni', Qgis.Warning)
-            return False
-
-        zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
-        if len(zaznaczone_elementy) < 3:
-            QgsMessageLog.logMessage('Wybierz co najmniej 3 punkty na warstwie.', 'Pole powierzchni', Qgis.Warning)
-            return False
-        
-        zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
-        if len(zaznaczone_elementy) > 3:
-            QgsMessageLog.logMessage('Wybierz co najwyżej 3 punkty na warstwie.', 'Pole powierzchni', Qgis.Warning)
-            return False
-        
-        zaznaczone_elementy = self.warstwa.currentLayer().selectedFeatures()
-        x1 = zaznaczone_elementy[0]['x2000'] 
-        y1 = zaznaczone_elementy[0]['y2000']
-        x2 = zaznaczone_elementy[1]['x2000'] 
-        y2 = zaznaczone_elementy[1]['y2000']
-        x3 = zaznaczone_elementy[2]['x2000'] 
-        y3 = zaznaczone_elementy[2]['y2000']
-        def PL002GK(x_00,y_00):
-            strefa = int(y_00/1000000)
-            xgk = x_00/0.999923
-            ygk = (y_00 - strefa * 1000000 - 500000)/0.999923
-            return(xgk,ygk)
-        xgk1, ygk1 = PL002GK(float(x1), float(y1))
-        xgk2, ygk2 = PL002GK(float(x2), float(y2))
-        xgk3, ygk3 = PL002GK(float(x3), float(y3))
-        a = sqrt((xgk2 - xgk1)**2 + (ygk2 - ygk1)**2) #1-2
-        b = sqrt((xgk2 - xgk3)**2 + (ygk2 - ygk3)**2) #2-3
-        c = sqrt((xgk3 - xgk1)**2 + (ygk2 - ygk3)**2) #1-3
-        s = (a + b + c) / 2
-        pole_P = sqrt(s * (s - a) * (s - b) * (s - c))
-        self.label_P.setText(str(pole_P))
-        
-        QgsMessageLog.logMessage('Pole powierzchni między zaznaczonymi punktami: ' + str(pole_P) , 'Pole powierzchni', Qgis.Success)
-        '''
         
         
     
